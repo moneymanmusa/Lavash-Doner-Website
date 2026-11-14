@@ -12,7 +12,7 @@ python -m http.server 5173
 | Section | Notes |
 |---|---|
 | Top bar | Logo/name scrolls to top · Home · Menu dropdown (jumps to each category) · About Us · Testimonials · Delivery · Location · Instagram & TikTok |
-| Home | Scroll-driven hero: garlic & hot-sauce bottles pour over the döner plate, splats burst, wrap & sandwich fly in; the text gets more detailed as you scroll |
+| Home | Full-screen scroll-driven hero (`js/hero.js`): an illustrated döner bowl assembles itself, garlic & hot-sauce bottles pour messy liquid sauce that pools, splashes and drips, then an illustrated wrap flies in; the text gets more detailed as you scroll |
 | Döner Box special | Weekday 11–4 deal from Instagram |
 | Menu | Category icon bar + photo cards (Gladiator-style). Data lives in `js/menu-data.js` |
 | Instagram | Real @lavash_doner posts, each linking to the post |
@@ -28,8 +28,8 @@ python -m http.server 5173
 - **Menu items / photos**: `js/menu-data.js` — drop new photos in `assets/img/menu/` and set `img`.
   Items without a photo show a "Photo coming soon" tile.
 - **Reviews**: `js/reviews-data.js`
-- **Hero photos**: `assets/img/hero-bowl.webp` (the plate), `assets/img/hero-wrap.webp`, and
-  `assets/img/menu/chicken-doner-sandwich.webp` — replace these to change the animated food.
+- **Hero animation**: the bowl and wrap are drawn in code in `js/hero.js` (`buildBowl`, `buildWrap`);
+  sauce timing lives in the `TL` object there.
 
 ### Contact form
 Set `contactEmail` in `js/config.js`. Messages are delivered through FormSubmit; the first
