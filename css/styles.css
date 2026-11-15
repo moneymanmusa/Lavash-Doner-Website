@@ -218,9 +218,9 @@ p { margin: 0 0 1em; }
 /* ==========================================================
    HERO (scroll-driven)
    ========================================================== */
-.hero { position: relative; height: 420vh; background: var(--black); }
+.hero { position: relative; height: 100vh; height: 100svh; min-height: 620px; background: var(--black); }
 .hero__sticky {
-  position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden;
+  position: relative; height: 100%; overflow: hidden;
   isolation: isolate;
 }
 .hero__sticky::after { content: ""; position: absolute; inset: 0; background-image: var(--grain); pointer-events: none; z-index: 5; opacity: .9; }
@@ -313,22 +313,22 @@ p { margin: 0 0 1em; }
 
 /* Copy */
 .hero__copy {
-  position: absolute; z-index: 6; left: max(16px, calc((100vw - 1400px) / 2 + 16px)); top: 50%;
-  translate: 0 -46%; width: min(560px, 44vw);
+  position: absolute; z-index: 6; left: max(16px, calc((100vw - 1400px) / 2 + 16px)); top: 52%;
+  translate: 0 -50%; width: min(560px, 44vw);
+  animation: copy-in 1s var(--ease) .2s both;
 }
-.hero__step {
-  position: absolute; inset: auto 0 auto 0; top: 0; translate: 0 -50%;
-  opacity: 0; transform: translateY(40px); filter: blur(6px);
-  transition: opacity .6s var(--ease), transform .7s var(--ease), filter .6s var(--ease);
-  pointer-events: none;
+@keyframes copy-in { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
+.hero__tagline {
+  margin: 18px 0 0; font-family: var(--f-display); text-transform: uppercase; letter-spacing: .02em;
+  font-size: clamp(1.6rem, 2.8vw, 2.5rem); line-height: 1; color: #fff; min-height: 1em;
 }
-.hero__step.is-active { opacity: 1; transform: none; filter: none; pointer-events: auto; }
-.hero__step.is-past { transform: translateY(-40px); }
+.hero__tagline span { display: inline-block; transition: opacity .45s var(--ease), transform .45s var(--ease), filter .45s; }
+.hero__tagline span.is-out { opacity: 0; transform: translateY(14px); filter: blur(4px); }
 .hero__title { font-family: var(--f-logo); font-weight: 400; text-transform: uppercase; line-height: .86; letter-spacing: .01em; }
-.hero__title-line { display: block; font-size: clamp(4.2rem, 10vw, 9.5rem); color: #fff; }
+.hero__title-line { display: block; font-size: clamp(4rem, 8.6vw, 8.4rem); color: #fff; }
 .hero__title-line--orange { color: var(--orange); text-shadow: 0 0 60px rgba(253,109,20,.45); }
 .hero__h { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: clamp(3rem, 6.6vw, 6.2rem); line-height: .95; color: #fff; }
-.hero__lead { margin-top: 22px; font-size: clamp(1.02rem, 1.5vw, 1.28rem); color: #e9e2db; max-width: 34ch; }
+.hero__lead { margin-top: 16px; font-size: clamp(1.02rem, 1.5vw, 1.28rem); color: #e9e2db; max-width: 34ch; }
 .hero__lead strong { color: var(--orange); }
 .hero__chips { list-style: none; padding: 0; margin: 22px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .hero__chips li {
@@ -338,15 +338,13 @@ p { margin: 0 0 1em; }
 .hero__chips svg { width: 16px; height: 16px; color: var(--orange); }
 .hero__ctas { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 12px; }
 
-.hero__progress { position: absolute; z-index: 6; right: 22px; top: 50%; translate: 0 -50%; list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-.hero__progress li { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.25); transition: background .3s, transform .3s, height .3s; }
-.hero__progress li.is-active { background: var(--orange); height: 30px; border-radius: 6px; }
 .hero__hint {
   position: absolute; z-index: 6; left: 50%; bottom: 24px; translate: -50% 0;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   font-size: .72rem; font-weight: 700; letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.7);
-  transition: opacity .4s;
+  text-decoration: none; transition: opacity .4s, color .2s;
 }
+.hero__hint:hover { color: var(--orange); }
 .hero__hint i { width: 24px; height: 38px; border: 2px solid rgba(255,255,255,.5); border-radius: 14px; position: relative; }
 .hero__hint i::after { content: ""; position: absolute; left: 50%; top: 7px; width: 4px; height: 8px; margin-left: -2px; border-radius: 4px; background: var(--orange); animation: wheel 1.6s ease-in-out infinite; }
 @keyframes wheel { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(12px); opacity: 0; } }
@@ -707,21 +705,20 @@ p { margin: 0 0 1em; }
   .topbar__actions .socials--top { display: flex; border: 0; padding: 0; margin: 0; }
   .topbar__actions .socials--top a { width: 38px; height: 38px; }
 
-  .hero { height: 380vh; }
-  .bowl { --size: min(104vw, 54vh); left: 54%; top: 32%; }
+  .hero { min-height: 640px; }
+  .bowl { --size: min(100vw, 46vh); left: 54%; top: 29%; }
   .wrap-ill { width: 25vw; left: 88%; top: 50%; }
   .hero__scrim { background: linear-gradient(0deg, rgba(11,11,11,.96) 0%, rgba(11,11,11,.86) 36%, rgba(11,11,11,.2) 52%, rgba(11,11,11,0) 60%); }
-  .hero__copy { left: 16px; right: 16px; width: auto; top: auto; bottom: 4%; translate: none; height: 46%; }
-  .hero__step .kicker { margin-bottom: 8px; }
-  .hero__step { top: auto; bottom: 0; translate: none; }
-  .hero__title-line { font-size: clamp(3.6rem, 17vw, 6rem); }
+  .hero__copy { left: 16px; right: 16px; width: auto; top: auto; bottom: 22px; translate: none; }
+  .hero__copy .kicker { margin-bottom: 8px; }
+  .hero__tagline { margin-top: 10px; font-size: 1.55rem; }
+  .hero__title-line { font-size: clamp(3.2rem, 15vw, 5rem); }
   .hero__h { font-size: clamp(2.5rem, 11vw, 4rem); }
   .hero__lead { margin-top: 12px; font-size: 1rem; max-width: none; }
   .hero__chips { margin-top: 14px; }
   .hero__chips li { font-size: .78rem; padding: 6px 10px; }
   .hero__ctas { margin-top: 16px; }
   .hero__ctas .btn { padding: .75em 1.3em; font-size: .9rem; }
-  .hero__progress { right: 10px; top: 31%; }
   .hero__hint { display: none; }
   .hero__glow { left: 54%; top: 32%; }
 
@@ -776,7 +773,5 @@ p { margin: 0 0 1em; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .reveal { opacity: 1; transform: none; transition: none; }
-  .hero { height: auto; }
-  .hero__sticky { position: relative; min-height: 100svh; }
   .about__badge, .bowl__steam i, .hero__hint i::after { animation: none; }
 }

@@ -86,6 +86,21 @@
     ${gooFilter("goo", 6, 24, -10, 2.6, 3.6, 3)}
     ${gooFilter("goo-sm", 3.2, 22, -9, 1.4, 2, 1.8)}
     ${gooFilter("goo-lg", 9, 26, -11, 4, 6, 5)}
+    <radialGradient id="ck0" cx="50%" cy="48%" r="60%"><stop offset="0" stop-color="#f8d896"/><stop offset=".42" stop-color="#eeaf5a"/><stop offset=".78" stop-color="#cf7a2a"/><stop offset="1" stop-color="#8d4213"/></radialGradient>
+    <radialGradient id="ck1" cx="45%" cy="50%" r="62%"><stop offset="0" stop-color="#f5cb80"/><stop offset=".48" stop-color="#e59a40"/><stop offset=".84" stop-color="#bb6420"/><stop offset="1" stop-color="#7a3610"/></radialGradient>
+    <radialGradient id="ck2" cx="52%" cy="46%" r="58%"><stop offset="0" stop-color="#fbe5b2"/><stop offset=".4" stop-color="#f0bd6c"/><stop offset=".75" stop-color="#d88c38"/><stop offset="1" stop-color="#9a4b16"/></radialGradient>
+    <radialGradient id="ck3" cx="50%" cy="50%" r="60%"><stop offset="0" stop-color="#efb664"/><stop offset=".45" stop-color="#d9832e"/><stop offset=".8" stop-color="#aa5418"/><stop offset="1" stop-color="#65290b"/></radialGradient>
+    <linearGradient id="ck4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a24a14"/><stop offset=".35" stop-color="#dc8b38"/><stop offset=".7" stop-color="#f6d08e"/><stop offset="1" stop-color="#e8a658"/></linearGradient>
+    <linearGradient id="ck5" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#933f12"/><stop offset=".4" stop-color="#d47f30"/><stop offset=".75" stop-color="#f3c47c"/><stop offset="1" stop-color="#cf7c34"/></linearGradient>
+    <radialGradient id="bf0" cx="50%" cy="50%" r="60%"><stop offset="0" stop-color="#a6623a"/><stop offset=".5" stop-color="#7a3d1d"/><stop offset="1" stop-color="#3f1d0b"/></radialGradient>
+    <radialGradient id="bf1" cx="50%" cy="50%" r="60%"><stop offset="0" stop-color="#93532e"/><stop offset=".6" stop-color="#64301a"/><stop offset="1" stop-color="#351809"/></radialGradient>
+    <radialGradient id="tom" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#ff7458"/><stop offset=".55" stop-color="#d9301d"/><stop offset="1" stop-color="#9a190c"/></radialGradient>
+    <filter id="meat-tex" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.5 0.12" numOctaves="2" seed="7" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.2  0 0 0 0 0.05  0 0 0 -0.9 0.44" result="nt"/>
+      <feComposite in="nt" in2="SourceAlpha" operator="in" result="tex"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="tex"/></feMerge>
+    </filter>
   </defs>`;
   document.body.appendChild(filterHost);
 
@@ -94,45 +109,71 @@
   /* ==========================================================
      ILLUSTRATION — food pieces
      ========================================================== */
-  const CHICKEN = [["#c9792e", "#f2ad5e", "#5a2a0c"], ["#b8661f", "#e89a4c", "#4a2008"], ["#d88b3c", "#f8c074", "#6a330f"], ["#a85a1c", "#dc8c45", "#43200a"], ["#c46f27", "#f0a253", "#55270b"]];
-  const BEEF = [["#6e3417", "#a65c2e", "#2c1306"], ["#7d3c1b", "#b06535", "#301507"], ["#5c2a12", "#93502a", "#240f05"]];
-
-  function meatStrip(r, x, y, len, w) {
-    const pal = r() < 0.62 ? CHICKEN : BEEF;
-    const c = pick(r, pal);
+  // Shaved chicken döner: thin torn slices — pale juicy middle, golden-brown
+  // seared edges, visible grain, a little marinade tint and crispy char.
+  function meatStrip(r, x, y, len, w, beefChance = 0.06) {
+    const beef = r() < beefChance;
+    const grad = beef ? `bf${Math.floor(r() * 2)}` : `ck${Math.floor(r() * 6)}`;
     let a = r() * TAU;
-    const spine = [];
-    let px = x - Math.cos(a) * len / 2, py = y - Math.sin(a) * len / 2;
-    for (let i = 0; i < 5; i++) { spine.push([px, py]); a += (r() - 0.5) * 0.6; px += Math.cos(a) * len / 4; py += Math.sin(a) * len / 4; }
+    const N = 7, spine = [];
+    let px = x - (Math.cos(a) * len) / 2, py = y - (Math.sin(a) * len) / 2;
+    for (let i = 0; i < N; i++) { spine.push([px, py]); a += (r() - 0.5) * 0.38; px += (Math.cos(a) * len) / (N - 1); py += (Math.sin(a) * len) / (N - 1); }
     const L = [], R = [];
-    for (let i = 0; i < 5; i++) {
-      const p = spine[i], q = spine[Math.min(4, i + 1)], o = spine[Math.max(0, i - 1)];
+    for (let i = 0; i < N; i++) {
+      const t = i / (N - 1);
+      const p = spine[i], q = spine[Math.min(N - 1, i + 1)], o = spine[Math.max(0, i - 1)];
       let tx = q[0] - o[0], ty = q[1] - o[1]; const tl = Math.hypot(tx, ty) || 1; tx /= tl; ty /= tl;
-      const ww = (w * (0.45 + 0.55 * Math.sin(Math.PI * (0.06 + 0.88 * (i / 4)))) * (0.7 + r() * 0.6)) / 2;
-      L.push([p[0] - ty * ww, p[1] + tx * ww]); R.push([p[0] + ty * ww, p[1] - tx * ww]);
+      const base = w * (0.42 + 0.58 * Math.sin(Math.PI * (0.03 + 0.94 * t)));
+      const lw = base * (0.32 + r() * 0.26), rw = base * (0.32 + r() * 0.26);
+      const jx = (r() - 0.5) * w * 0.08, jy = (r() - 0.5) * w * 0.08;
+      L.push([p[0] - ty * lw + jx, p[1] + tx * lw + jy]);
+      R.push([p[0] + ty * rw - jx, p[1] - tx * rw - jy]);
     }
-    let s = `<path d="${smooth(L.concat(R.reverse()), true)}" fill="${c[0]}" stroke="${c[2]}" stroke-width="${f1(w * 0.1)}" stroke-linejoin="round"/>`;
-    s += `<path d="${smooth(spine, false)}" fill="none" stroke="${c[1]}" stroke-width="${f1(w * 0.22)}" stroke-linecap="round" opacity=".6"/>`;
-    if (r() < 0.45) {
-      const k = spine[1 + Math.floor(r() * 3)];
-      s += `<ellipse cx="${f1(k[0])}" cy="${f1(k[1])}" rx="${f1(w * 0.24)}" ry="${f1(w * 0.12)}" fill="#2a1104" opacity=".75" transform="rotate(${Math.round(r() * 180)} ${f1(k[0])} ${f1(k[1])})"/>`;
+    const d = smooth(L.concat(R.reverse()), true);
+    let s = `<path d="${d}" fill="#1a0b03" opacity=".32" transform="translate(${f1(w * 0.1)} ${f1(w * 0.14)})"/>`;
+    s += `<path d="${d}" fill="url(#${grad})"/>`;
+    s += `<path d="${d}" fill="none" stroke="${beef ? "#241005" : "#74360e"}" stroke-width="${f1(w * 0.11)}" stroke-linejoin="round" opacity=".5"/>`;
+    if (!beef) {
+      // muscle grain running along the slice
+      for (let k = -1; k <= 1; k++) {
+        const off = k * w * 0.16 + (r() - 0.5) * w * 0.05;
+        const fib = spine.slice(1, N - 1).map((p, i) => {
+          const q = spine[i + 2], o = spine[i];
+          let tx = q[0] - o[0], ty = q[1] - o[1]; const tl = Math.hypot(tx, ty) || 1;
+          return [p[0] - (ty / tl) * off, p[1] + (tx / tl) * off];
+        });
+        s += `<path d="${smooth(fib, false)}" fill="none" stroke="${k === 0 ? "#f8e2b4" : "#a8642a"}" stroke-width="${f1(k === 0 ? 1.6 : 1.1)}" stroke-linecap="round" opacity="${k === 0 ? ".55" : ".32"}"/>`;
+      }
+      if (r() < 0.42) {
+        const m = spine[2 + Math.floor(r() * 3)];
+        s += `<ellipse cx="${f1(m[0])}" cy="${f1(m[1])}" rx="${f1(len * 0.26)}" ry="${f1(w * 0.22)}" fill="#d4561c" opacity=".2" transform="rotate(${Math.round((a * 180) / Math.PI)} ${f1(m[0])} ${f1(m[1])})"/>`;
+      }
+    }
+    if (r() < 0.6) {
+      const e = (r() < 0.5 ? L : R)[1 + Math.floor(r() * (N - 2))];
+      const cr = w * (0.07 + r() * 0.07);
+      s += `<circle cx="${f1(e[0])}" cy="${f1(e[1])}" r="${f1(cr)}" fill="#3a1a06" opacity=".7"/><circle cx="${f1(e[0] + cr)}" cy="${f1(e[1] - cr * 0.6)}" r="${f1(cr * 0.7)}" fill="#4a2209" opacity=".6"/>`;
+    }
+    if (r() < 0.55) {
+      const g = spine[1 + Math.floor(r() * (N - 2))];
+      s += `<ellipse cx="${f1(g[0])}" cy="${f1(g[1])}" rx="${f1(w * 0.16)}" ry="${f1(w * 0.06)}" fill="#fff6dc" opacity=".55" transform="rotate(${Math.round((a * 180) / Math.PI)} ${f1(g[0])} ${f1(g[1])})"/>`;
     }
     return s;
   }
-  function shred(r, x, y, len, w, color, vein) {
+  function shred(r, x, y, len, w, color, vein, veinW = 0.22, veinO = 0.7) {
     const a = r() * TAU;
     const x1 = x + Math.cos(a) * len, y1 = y + Math.sin(a) * len;
     const mx = (x + x1) / 2 - Math.sin(a) * (r() - 0.5) * len * 0.9;
     const my = (y + y1) / 2 + Math.cos(a) * (r() - 0.5) * len * 0.9;
     const d = `M${f1(x)},${f1(y)}Q${f1(mx)},${f1(my)} ${f1(x1)},${f1(y1)}`;
     let s = `<path d="${d}" stroke="${color}" stroke-width="${f1(w)}" stroke-linecap="round" fill="none"/>`;
-    if (vein) s += `<path d="${d}" stroke="${vein}" stroke-width="${f1(w * 0.22)}" stroke-linecap="round" fill="none" opacity=".7"/>`;
+    if (vein) s += `<path d="${d}" stroke="${vein}" stroke-width="${f1(w * veinW)}" stroke-linecap="round" fill="none" opacity="${veinO}"/>`;
     return s;
   }
   function tomato(r, x, y, sz) {
     const a = Math.round(r() * 90);
     return `<g transform="rotate(${a} ${f1(x)} ${f1(y)})">
-      <rect x="${f1(x - sz / 2)}" y="${f1(y - sz / 2)}" width="${f1(sz)}" height="${f1(sz)}" rx="${f1(sz * 0.28)}" fill="#cf2c1c" stroke="#8c1508" stroke-width="1.5"/>
+      <rect x="${f1(x - sz / 2)}" y="${f1(y - sz / 2)}" width="${f1(sz)}" height="${f1(sz)}" rx="${f1(sz * 0.28)}" fill="url(#tom)" stroke="#8c1508" stroke-width="1.5"/>
       <rect x="${f1(x - sz / 2 + sz * 0.14)}" y="${f1(y - sz / 2 + sz * 0.12)}" width="${f1(sz * 0.48)}" height="${f1(sz * 0.26)}" rx="${f1(sz * 0.12)}" fill="#ff8264" opacity=".6"/>
       <ellipse cx="${f1(x + sz * 0.12)}" cy="${f1(y + sz * 0.14)}" rx="${f1(sz * 0.2)}" ry="${f1(sz * 0.12)}" fill="#f6b46a" opacity=".75"/>
     </g>`;
@@ -170,6 +211,7 @@
       <radialGradient id="bw-out" cx="38%" cy="32%" r="72%"><stop offset="0" stop-color="#2c2c2c"/><stop offset=".65" stop-color="#121212"/><stop offset="1" stop-color="#040404"/></radialGradient>
       <radialGradient id="bw-in" cx="50%" cy="50%" r="50%"><stop offset=".8" stop-color="#141414"/><stop offset="1" stop-color="#030303"/></radialGradient>
       <radialGradient id="bw-depth" cx="50%" cy="50%" r="50%"><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".62"/></radialGradient>
+      <radialGradient id="bw-pile" cx="50%" cy="50%" r="50%"><stop offset=".72" stop-color="#000" stop-opacity=".5"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
       <radialGradient id="bw-light" cx="40%" cy="36%" r="60%"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></radialGradient>
       <clipPath id="bw-food"><circle cx="500" cy="500" r="420"/></clipPath>
       <path id="bw-ring" d="M500,500 m-467,0 a467,467 0 1,1 934,0 a467,467 0 1,1 -934,0"/>
@@ -184,8 +226,8 @@
 
     // salad bed: lettuce, red cabbage, carrot
     let salad = `<g class="ing ing--salad"><path d="${sector(r, -6, 238, 70, 428)}" fill="#5f8f2c"/>`;
-    for (let i = 0; i < 230; i++) { const [x, y] = polar(r, -6, 238, 110, 418); salad += shred(r, x, y, 34 + r() * 40, 13 + r() * 9, pick(r, ["#b7dc7e", "#9fcf5f", "#86bf45", "#cbe79b", "#74b03a", "#d8eeb0"]), r() < 0.5 ? "#e9f6cf" : null); }
-    for (let i = 0; i < 95; i++) { const [x, y] = polar(r, 100, 236, 150, 415); salad += shred(r, x, y, 30 + r() * 36, 7 + r() * 4, pick(r, ["#6a1d55", "#842a6c", "#9e3d82", "#b9579c"])); }
+    for (let i = 0; i < 230; i++) { const [x, y] = polar(r, -6, 238, 110, 418); salad += shred(r, x, y, 34 + r() * 40, 13 + r() * 9, pick(r, ["#86bd4c", "#79b23f", "#9ccd5e", "#6ea838"]), pick(r, ["#e6f4c8", "#d9eeb0", "#f0f8de", "#cfe8a2"]), 0.58, 0.95); }
+    for (let i = 0; i < 95; i++) { const [x, y] = polar(r, 100, 236, 150, 415); salad += shred(r, x, y, 30 + r() * 36, 7 + r() * 4, pick(r, ["#5e1a4c", "#7a2563", "#923878"]), "#ecc9e4", 0.3, 0.55); }
     for (let i = 0; i < 55; i++) { const [x, y] = polar(r, 40, 236, 160, 410); salad += shred(r, x, y, 28 + r() * 30, 4 + r() * 1.6, pick(r, ["#ff9a2e", "#f57f17", "#ffb04d"])); }
     salad += `</g>`;
 
@@ -207,14 +249,15 @@
 
     // shaved döner piled in the middle
     const strips = [];
-    for (let i = 0; i < 300; i++) {
-      const a = r() * TAU, rr = 250 * Math.sqrt(r());
+    for (let i = 0; i < 330; i++) {
+      const a = r() * TAU, rr = 248 * Math.sqrt(r());
       strips.push({ x: 478 + Math.cos(a) * rr * 1.06, y: 474 + Math.sin(a) * rr * 0.94, d: rr });
     }
     for (let i = 0; i < 26; i++) { const a = rad(-40 + r() * 120), rr = 250 + r() * 60; strips.push({ x: 478 + Math.cos(a) * rr, y: 474 + Math.sin(a) * rr, d: rr }); }
     strips.sort((p, q) => q.d - p.d);
-    let meat = `<g class="ing ing--meat"><path d="${sector(r, 0, 360, 0, 262, 478, 474)}" fill="#7a3d16"/>`;
-    strips.forEach((m) => { meat += meatStrip(r, m.x, m.y, 52 + r() * 34, 30 + r() * 18); });
+    let meat = `<circle cx="492" cy="492" r="300" fill="url(#bw-pile)"/><g class="ing ing--meat"><g filter="url(#meat-tex)"><path d="${sector(r, 0, 360, 0, 258, 478, 474)}" fill="#c27a32"/>`;
+    strips.forEach((m) => { meat += meatStrip(r, m.x, m.y, 58 + r() * 36, 30 + r() * 16); });
+    meat += `</g>`;
     meat += `<circle cx="470" cy="455" r="290" fill="url(#bw-light)"/>`;
     for (let i = 0; i < 34; i++) { const [x, y] = polar(r, 0, 360, 0, 240, 478, 474); meat += `<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="${f1(4 + r() * 6)}" ry="${f1(2 + r() * 2)}" fill="#fff" opacity="${f1(0.18 + r() * 0.25)}" transform="rotate(${Math.round(r() * 180)} ${f1(x)} ${f1(y)})"/>`; }
     meat += `</g>`;
@@ -261,10 +304,10 @@
     for (let i = 0; i < 16; i++) { const [x, y] = inPile(); back += shred(r, x, y, 18 + r() * 18, 4.5 + r() * 2, pick(r, ["#6a1d55", "#842a6c", "#a3447f"])); }
     const ms = [];
     for (let i = 0; i < 46; i++) { const [x, y] = inPile(); ms.push([x, y]); }
-    ms.sort((p, q) => p[1] - q[1]).forEach(([x, y]) => { mid += meatStrip(r, x, y, 30 + r() * 22, 11 + r() * 7); });
+    ms.sort((p, q) => p[1] - q[1]).forEach(([x, y]) => { mid += meatStrip(r, x, y, 34 + r() * 22, 15 + r() * 7); });
     for (let i = 0; i < 7; i++) { const [x, y] = inPile(); front += tomato(r, x, y + 8, 16 + r() * 6); }
     for (let i = 0; i < 4; i++) { const [x, y] = inPile(); front += onion(r, x, y + 6, 10 + r() * 5); }
-    s += back + mid + front;
+    s += back + `<g filter="url(#meat-tex)">` + mid + `</g>` + front;
     // front lip of the bread
     s += `<path d="M24,150 A136,42 0 0 0 296,150 L296,166 A136,48 0 0 1 24,166 Z" fill="#eecb90" stroke="#b9793a" stroke-width="2"/>`;
     // branded paper sleeve
@@ -462,12 +505,12 @@
 
   const bottles = { garlic: hero.querySelector("[data-bottle=garlic]"), hot: hero.querySelector("[data-bottle=hot]") };
   const wrap = hero.querySelector("[data-wrap]");
-  const steps = Array.from(hero.querySelectorAll("[data-step]"));
-  const dots = Array.from(hero.querySelectorAll(".hero__progress li"));
-  const hint = hero.querySelector(".hero__hint");
+  const tagline = hero.querySelector("[data-tagline]");
+  const TAGS = ["Fresh off the spit.", "Sauced up. Loaded up.", "Wrapped in warm lavash.", "Mississauga's döner spot."];
+  const sauceLayers = [sauceSvg, bowlSplatSvg, bgSvg];
   const mq1 = hero.querySelector("[data-marquee]"), mq2 = hero.querySelector("[data-marquee2]");
 
-  // timelines (fractions of the hero's scroll length)
+  // timelines (fractions of one animation cycle)
   const TL = {
     garlic: { in: [0.04, 0.1], flowIn: [0.095, 0.125], pour: [0.11, 0.36], flowOut: [0.36, 0.385], out: [0.38, 0.44] },
     hot: { in: [0.37, 0.43], flowIn: [0.425, 0.455], pour: [0.44, 0.63], flowOut: [0.63, 0.655], out: [0.65, 0.71] }
@@ -499,13 +542,16 @@
     pour.updateStream(seg(p, tl.flowIn[0], tl.flowIn[1]), seg(p, tl.flowOut[0], tl.flowOut[1]), [Nx, Ny], C, T, time);
   }
 
-  let step = -1, shown = 0, target = 0, running = false, inView = true, lastScale = -1;
+  let tagIdx = 0, running = false, inView = true, lastFade = -1;
 
-  function render(p, time) {
-    // bowl gently grows as you scroll
-    const sc = 1 + easeInOut(p) * 0.05;
-    if (Math.abs(sc - lastScale) > 0.0005) { bowl.style.transform = `scale(${sc.toFixed(4)})`; lastScale = sc; }
+  function setTag(i) {
+    if (i === tagIdx || !tagline) return;
+    tagIdx = i;
+    tagline.classList.add("is-out");
+    setTimeout(() => { tagline.textContent = TAGS[i]; tagline.classList.remove("is-out"); }, 420);
+  }
 
+  function render(p, time, clock, fade) {
     pourScene(p, time, garlic, bottles.garlic, -1, TL.garlic);
     pourScene(p, time, hot, bottles.hot, 1, TL.hot);
 
@@ -514,45 +560,44 @@
 
     // the wrap flies in and gets sauced too
     const w = easeOut(seg(p, 0.64, 0.77));
-    wrap.style.opacity = w.toFixed(3);
+    wrap.style.opacity = (w * fade).toFixed(3);
     wrap.style.transform = `translate(calc(-50% + ${lerp(60, 0, w).toFixed(2)}vw), calc(-50% + ${lerp(20, 0, w).toFixed(2)}vh)) rotate(${(lerp(40, -14, w) + Math.sin(time * 0.0012) * 1.5).toFixed(2)}deg)`;
     wrapGarlic.update(seg(p, 0.74, 0.86));
     wrapHot.update(seg(p, 0.82, 0.93));
 
-    mq1.style.transform = `translateX(${(-p * 35).toFixed(2)}%)`;
-    mq2.style.transform = `translateX(${(-35 + p * 35).toFixed(2)}%)`;
-    hint.style.opacity = (1 - seg(p, 0, 0.04)).toFixed(2);
-
-    const s = reduce ? 3 : p < 0.15 ? 0 : p < 0.42 ? 1 : p < 0.68 ? 2 : 3;
-    if (s !== step) {
-      step = s;
-      steps.forEach((el, i) => {
-        el.classList.toggle("is-active", i === s);
-        el.classList.toggle("is-past", i < s);
-        el.setAttribute("aria-hidden", i === s ? "false" : "true");
-      });
-      dots.forEach((d, i) => d.classList.toggle("is-active", i === s));
+    // end of each loop: the sauce fades away, then it all pours again
+    if (Math.abs(fade - lastFade) > 0.003) {
+      sauceLayers.forEach((l) => (l.style.opacity = fade.toFixed(3)));
+      lastFade = fade;
     }
+
+    const shift = (clock * 0.0011) % 50;
+    mq1.style.transform = `translateX(${(-shift).toFixed(2)}%)`;
+    mq2.style.transform = `translateX(${(-50 + shift).toFixed(2)}%)`;
+
+    setTag(p < 0.1 ? 0 : p < 0.66 ? 1 : p < 0.92 ? 2 : 3);
   }
 
-  function readProgress() {
-    if (reduce) return 1;
-    const rect = hero.getBoundingClientRect();
-    const total = hero.offsetHeight - window.innerHeight;
-    return total > 0 ? clamp(-rect.top / total) : 0;
-  }
-  function frame(time) {
-    target = readProgress();
-    shown += (target - shown) * 0.16;
-    if (Math.abs(target - shown) < 0.0004) shown = target;
-    render(shown, time);
-    if (inView && !reduce) requestAnimationFrame(frame);
+  // One cycle: ~14s of pouring, hold the finished bowl, fade the sauce, repeat.
+  const DUR = 14000, HOLD = 4500, FADE = 900, CYCLE = DUR + HOLD + FADE;
+  let clock = -1900; // let the bowl assemble itself first
+  let last = null;
+  function frame(now) {
+    if (last === null) last = now;
+    clock += Math.min(250, now - last);
+    last = now;
+    const tc = clock < 0 ? clock : clock % CYCLE;
+    const p = clamp(tc / DUR);
+    const fade = tc > DUR + HOLD ? clamp(1 - (tc - DUR - HOLD) / FADE) : 1;
+    render(p, now, clock, fade);
+    if (inView && !reduce && !document.hidden) requestAnimationFrame(frame);
     else running = false;
   }
-  function start() { if (!running) { running = true; requestAnimationFrame(frame); } }
+  function start() { if (!running) { running = true; last = null; requestAnimationFrame(frame); } }
 
   new IntersectionObserver(([e]) => { inView = e.isIntersecting; if (inView) start(); }).observe(hero);
-  if (reduce) { render(1, 0); return; }
-  shown = target = readProgress();
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && inView) start(); });
+  hero.seekAnimation = (ms) => { clock = ms; }; // handy for testing the timeline
+  if (reduce) { render(1, 0, 0, 1); if (tagline) tagline.textContent = TAGS[3]; return; }
   start();
 })();
