@@ -171,21 +171,28 @@
         <div class="hero__stage" aria-hidden="true">
           <div class="bowl" data-bowl>
             <svg class="bowl__splats" viewBox="-450 -450 1900 1900" data-bowl-splats></svg>
-            <svg class="bowl__art" viewBox="0 0 1000 1000" data-bowl-art></svg>
-            <svg class="bowl__sauce" viewBox="0 0 1000 1000" data-bowl-sauce></svg>
+            <div class="bowl__intro">
+              <div class="bowl__tilt" data-bowl-tilt>
+                <img class="bowl__img" src="assets/img/hero-bowl-art.webp"
+                     srcset="assets/img/hero-bowl-art-sm.webp 640w, assets/img/hero-bowl-art.webp 1000w"
+                     sizes="(max-width: 960px) 92vw, 64vw" width="1000" height="1000" alt="" fetchpriority="high">
+                <div class="bowl__shine"></div>
+                <svg class="bowl__sauce" viewBox="0 0 1000 1000" data-bowl-sauce></svg>
+                <div class="bowl__glints">
+                  <i style="left:38%;top:30%"></i><i style="left:58%;top:38%;animation-delay:.9s"></i><i style="left:45%;top:55%;animation-delay:1.7s"></i>
+                  <i style="left:66%;top:22%;animation-delay:2.4s"></i><i style="left:30%;top:46%;animation-delay:3.1s"></i><i style="left:55%;top:64%;animation-delay:3.8s"></i>
+                </div>
+              </div>
+            </div>
             <div class="bowl__steam"><i></i><i></i><i></i></div>
             <div class="bottle bottle--garlic" data-bottle="garlic">
               <svg viewBox="0 0 120 240"><use href="#bottle-shape"/></svg>
               <span class="bottle__label">GARLIC</span>
             </div>
-            <div class="bottle bottle--hot" data-bottle="hot">
+            <div class="bottle bottle--orange" data-bottle="orange">
               <svg viewBox="0 0 120 240"><use href="#bottle-shape"/></svg>
-              <span class="bottle__label">HOT</span>
+              <span class="bottle__label">ORANGE</span>
             </div>
-          </div>
-
-          <div class="wrap-ill" data-wrap>
-            <svg viewBox="0 0 320 560" data-wrap-art></svg>
           </div>
         </div>
         <div class="hero__scrim" aria-hidden="true"></div>
@@ -209,7 +216,7 @@
             <span class="hero__title-line hero__title-line--orange">Döner</span>
           </h1>
           <p class="hero__tagline"><span data-tagline>Fresh off the spit.</span></p>
-          <p class="hero__lead">Juicy halal döner shaved straight off the rotisserie<span class="hide-sm"> — wrapped in warm lavash or piled high on a plate with our house-made garlic &amp; hot sauce</span>. <strong>3055 Argentia Rd.</strong></p>
+          <p class="hero__lead">Juicy halal döner shaved straight off the rotisserie<span class="hide-sm"> — wrapped in warm lavash or piled high on a plate with our house-made sauces</span>. <strong>3055 Argentia Rd.</strong></p>
           <ul class="hero__chips">
             <li><svg><use href="#i-star"/></svg> 4.6 on Google · 356 reviews</li>
             <li><svg><use href="#i-halal"/></svg> 100% Halal</li>

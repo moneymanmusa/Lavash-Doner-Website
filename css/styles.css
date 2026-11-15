@@ -252,17 +252,26 @@ p { margin: 0 0 1em; }
   box-shadow: 0 60px 120px rgba(0,0,0,.85), 0 0 160px rgba(253,109,20,.3);
 }
 .bowl__splats { position: absolute; inset: -45%; width: 190%; height: 190%; overflow: visible; z-index: 0; pointer-events: none; }
-.bowl__art { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; overflow: visible; will-change: transform; animation: bowl-in 1.2s var(--ease) both; }
-.bowl__sauce { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; overflow: visible; }
-@keyframes bowl-in { from { opacity: 0; transform: scale(.82) rotate(-30deg); } to { opacity: 1; transform: none; } }
-.bw-ring { font-family: var(--f-logo); font-size: 25px; letter-spacing: 3px; fill: var(--orange); opacity: .9; }
-.ing { transform-box: fill-box; transform-origin: center; animation: ing-in .8s var(--ease) both; }
-.ing--salad { animation-delay: .35s; }
-.ing--rice { animation-delay: .5s; }
-.ing--veg { animation-delay: .7s; }
-.ing--meat { animation-delay: .9s; }
-.ing--garnish { animation-delay: 1.15s; }
-@keyframes ing-in { from { opacity: 0; transform: translateY(-50px) scale(1.15); } to { opacity: 1; transform: none; } }
+.bowl__intro { position: absolute; inset: 0; z-index: 1; animation: bowl-in 1.3s cubic-bezier(.2,1.25,.35,1) both; }
+@keyframes bowl-in { 0% { opacity: 0; transform: translateY(-14%) scale(.78) rotate(-24deg); } 60% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+.bowl__tilt { position: absolute; inset: 0; will-change: transform; transform-style: preserve-3d; }
+.bowl__img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; filter: saturate(1.06) contrast(1.03); }
+.bowl__shine {
+  position: absolute; inset: 0; border-radius: 50%; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(circle at 32% 26%, rgba(255,240,215,.22), transparent 38%),
+              conic-gradient(from 210deg, transparent 0 30deg, rgba(255,255,255,.07) 45deg, transparent 70deg 360deg);
+  animation: shine-turn 9s linear infinite;
+}
+@keyframes shine-turn { to { transform: rotate(360deg); } }
+.bowl__sauce { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.bowl__glints { position: absolute; inset: 0; pointer-events: none; }
+.bowl__glints i {
+  position: absolute; width: 2.4%; aspect-ratio: 1; translate: -50% -50%; opacity: 0;
+  background: radial-gradient(circle, #fff 0 18%, rgba(255,255,255,0) 60%);
+  -webkit-mask: conic-gradient(from 45deg, #000 0 10deg, transparent 10deg 80deg, #000 80deg 100deg, transparent 100deg 170deg, #000 170deg 190deg, transparent 190deg 260deg, #000 260deg 280deg, transparent 280deg), radial-gradient(circle, #000 0 30%, transparent 32%);
+  animation: glint 4.6s ease-in-out infinite;
+}
+@keyframes glint { 0%, 70%, 100% { opacity: 0; transform: scale(.3) rotate(0deg); } 80% { opacity: .95; transform: scale(1.4) rotate(45deg); } 90% { opacity: 0; transform: scale(.6) rotate(90deg); } }
 
 .bowl__steam { position: absolute; left: 47%; top: 14%; width: 42%; height: 36%; translate: -50% 0; z-index: 3; pointer-events: none; }
 .bowl__steam i {
@@ -279,15 +288,6 @@ p { margin: 0 0 1em; }
   100% { transform: translateY(-60%) scaleX(1.3) rotate(8deg); opacity: 0; }
 }
 
-/* Illustrated döner wrap */
-.wrap-ill {
-  position: absolute; z-index: 3; width: min(30vh, 19vw); aspect-ratio: 320 / 560;
-  left: 90%; top: 70%; opacity: 0; will-change: transform, opacity;
-  filter: drop-shadow(0 30px 40px rgba(0,0,0,.65));
-}
-.wrap-ill svg { width: 100%; height: 100%; overflow: visible; display: block; }
-.wr-logo { font-family: var(--f-logo); font-size: 44px; fill: var(--orange); }
-.wr-tag { font-family: var(--f-body); font-weight: 700; font-size: 14px; letter-spacing: 3px; fill: #fff; }
 
 /* Squeeze bottles (positioned by js/hero.js in bowl %) */
 .bottle {
@@ -297,13 +297,13 @@ p { margin: 0 0 1em; }
 }
 .bottle svg { width: 100%; height: 100%; display: block; }
 .bottle--garlic { --bottle-body: #fbf4e6; --bottle-cap: #fd6d14; --bottle-label: #111; }
-.bottle--hot { --bottle-body: #d8321b; --bottle-cap: #111; --bottle-label: #fd6d14; }
+.bottle--orange { --bottle-body: #f2801f; --bottle-cap: #111; --bottle-label: #111; }
 .bottle__label {
   position: absolute; left: 18%; right: 18%; top: 34%; text-align: center;
   font-family: var(--f-display); font-size: calc(var(--size) * .03); letter-spacing: .06em;
   color: var(--orange); line-height: 1; transform: rotate(180deg);
 }
-.bottle--hot .bottle__label { color: #111; }
+.bottle--orange .bottle__label { color: #f2801f; }
 
 /* keeps the text readable over the full-screen scene */
 .hero__scrim {
@@ -707,7 +707,6 @@ p { margin: 0 0 1em; }
 
   .hero { min-height: 640px; }
   .bowl { --size: min(100vw, 46vh); left: 54%; top: 29%; }
-  .wrap-ill { width: 25vw; left: 88%; top: 50%; }
   .hero__scrim { background: linear-gradient(0deg, rgba(11,11,11,.96) 0%, rgba(11,11,11,.86) 36%, rgba(11,11,11,.2) 52%, rgba(11,11,11,0) 60%); }
   .hero__copy { left: 16px; right: 16px; width: auto; top: auto; bottom: 22px; translate: none; }
   .hero__copy .kicker { margin-bottom: 8px; }
@@ -815,10 +814,10 @@ html.nav-open, html.nav-open body { overflow: hidden; }
 
   /* hero: bowl tucked under the header, text below — never overlapping */
   .hero { height: 100svh; min-height: 600px; }
-  .bowl { --size: min(90vw, 42svh); left: 50%; top: calc(var(--topbar-h) + var(--size) / 2 + 6px); }
+  .bowl { --size: min(86vw, 39svh); left: 50%; top: calc(var(--topbar-h) + var(--size) / 2 + 8px); }
+  .hero__tagline { white-space: nowrap; font-size: min(1.55rem, 6.4vw); }
   .hero__copy { bottom: calc(18px + env(safe-area-inset-bottom)); }
   .hide-sm { display: none; }
-  .wrap-ill { width: 23vw; left: 89%; top: calc(var(--topbar-h) + 34svh); }
 
   /* menu category bar: show that it scrolls sideways */
   .menu-cats { scroll-snap-type: x proximity; -webkit-mask: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 44px), transparent 100%); mask: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 44px), transparent 100%); }
@@ -883,7 +882,6 @@ html.nav-open, html.nav-open body { overflow: hidden; }
 @media (max-width: 960px) and (orientation: landscape) and (max-height: 520px) {
   .hero { min-height: 360px; }
   .bowl { --size: min(78svh, 46vw); left: 72%; top: calc(50% + var(--topbar-h) / 2); }
-  .wrap-ill { width: 12vw; left: 93%; top: 70%; }
   .hero__copy { left: 16px; right: auto; width: 46vw; top: calc(50% + var(--topbar-h) / 2); bottom: auto; translate: 0 -50%; }
   .hero__title-line { font-size: clamp(2.2rem, 8vh + 2vw, 3.4rem); }
   .hero__tagline { font-size: 1.1rem; margin-top: 6px; }

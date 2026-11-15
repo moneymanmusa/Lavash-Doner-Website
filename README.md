@@ -12,7 +12,7 @@ python -m http.server 5173
 | Section | Notes |
 |---|---|
 | Top bar | Logo/name scrolls to top · Home · Menu dropdown (jumps to each category) · About Us · Testimonials · Delivery · Location · Instagram & TikTok |
-| Home | One-screen hero with a looping background animation (`js/hero.js`): an illustrated döner bowl assembles itself, garlic & hot-sauce bottles pour messy liquid sauce that pools, splashes and drips, an illustrated wrap flies in, then the sauce fades and it plays again. No scrolling needed |
+| Home | One-screen hero with a looping background animation (`js/hero.js`): a realistic döner bowl (rendered image, `assets/img/hero-bowl-art.webp`) drops in, sways and steams while garlic & orange sauce bottles drizzle liquid sauce that pools, splashes and drips; the sauce fades and it plays again. On desktop the bowl tilts toward the mouse. No scrolling needed |
 | Döner Box special | Weekday 11–4 deal from Instagram |
 | Menu | Category icon bar + photo cards (Gladiator-style). Data lives in `js/menu-data.js` |
 | Instagram | Real @lavash_doner posts, each linking to the post |
@@ -35,8 +35,8 @@ python -m http.server 5173
 - **Menu items / photos**: `js/menu-data.js` — drop new photos in `assets/img/menu/` and set `img`.
   Items without a photo show a "Photo coming soon" tile.
 - **Reviews**: `js/reviews-data.js`
-- **Hero animation**: the bowl and wrap are drawn in code in `js/hero.js` (`buildBowl`, `buildWrap`);
-  sauce timing lives in the `TL` object there, loop length in `DUR` / `HOLD` / `FADE`.
+- **Hero animation**: swap the bowl by replacing `assets/img/hero-bowl-art.webp` (and the `-sm` version for phones) with a
+  square, top-down bowl on a transparent background. Sauce colours are in `SAUCE`, timing in `TL`, loop length in `DUR` / `HOLD` / `FADE` (`js/hero.js`).
 
 ### Contact form
 Set `contactEmail` in `js/config.js`. Messages are delivered through FormSubmit; the first
