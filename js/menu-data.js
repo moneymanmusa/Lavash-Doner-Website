@@ -182,6 +182,7 @@ window.LAVASH_MENU = [
     id: "drinks",
     title: "Drinks",
     icon: "drink",
+    compact: true,
     blurb: "Something cold to wash it down.",
     items: [
       { name: "Ayran", img: "", desc: "Traditional savoury yogurt drink — smooth, tangy and refreshing." },

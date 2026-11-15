@@ -47,6 +47,8 @@
           <h3 class="menu-sec__title" id="mt-${c.id}">${esc(c.title)}</h3>
           <p class="menu-sec__blurb">${esc(c.blurb)}</p>
         </header>
+        ${c.compact ? `<ul class="menu-list">${c.items.map((it) => `
+          <li class="menu-list__item reveal"><span class="menu-list__icon">${icon(c.icon)}</span><span><b>${esc(it.name)}</b><span>${esc(it.desc)}</span></span></li>`).join("")}</ul>` : `
         <div class="menu-grid">
           ${c.items.map((it, i) => `
             <article class="mcard reveal" style="transition-delay:${(i % 4) * 70}ms">
@@ -60,7 +62,7 @@
               <h4 class="mcard__name">${esc(it.name)}</h4>
               <p class="mcard__desc">${esc(it.desc)}</p>
             </article>`).join("")}
-        </div>
+        </div>`}
       </section>`).join("");
   }
 
@@ -160,7 +162,8 @@
     // autoplay, paused on hover / focus / offscreen
     let timer = null, hovering = false, visible = false;
     const tick = () => { if (!hovering && visible && !document.hidden) go(current() + 1); };
-    const start = () => { if (!reduceMotion && !timer) timer = setInterval(tick, 6000); };
+    const start = () => { if (!reduceMotion && !timer) timer = setInterval(tick, 7000); };
+    track.addEventListener("touchstart", () => { clearInterval(timer); timer = -1; }, { passive: true });
     root.addEventListener("mouseenter", () => (hovering = true));
     root.addEventListener("mouseleave", () => (hovering = false));
     root.addEventListener("focusin", () => (hovering = true));
@@ -301,10 +304,13 @@
     const topbar = $(".topbar");
     const toTop = $(".to-top");
     const heroEl = $("[data-hero]");
+    const quickbar = $("[data-quickbar]");
     const onScroll = () => {
       const y = window.scrollY;
       topbar.classList.toggle("is-scrolled", y > 20);
-      toTop.classList.toggle("is-visible", y > (heroEl ? heroEl.offsetHeight : 900));
+      const past = y > (heroEl ? heroEl.offsetHeight * 0.6 : 600);
+      toTop.classList.toggle("is-visible", past);
+      if (quickbar) quickbar.classList.toggle("is-visible", past);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -320,12 +326,18 @@
     // mobile drawer
     const burger = $("[data-burger]");
     const drawer = $("[data-mobile-nav]");
-    function closeMobile() { if (!drawer) return; drawer.hidden = true; burger.setAttribute("aria-expanded", "false"); }
+    function closeMobile() {
+      if (!drawer) return;
+      drawer.hidden = true; burger.setAttribute("aria-expanded", "false");
+      document.documentElement.classList.remove("nav-open");
+    }
     burger.addEventListener("click", () => {
       const open = drawer.hidden;
       drawer.hidden = !open;
       burger.setAttribute("aria-expanded", String(open));
+      document.documentElement.classList.toggle("nav-open", open);
     });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !drawer.hidden) { closeMobile(); burger.focus(); } });
     drawer.addEventListener("click", (e) => { if (e.target.closest("a")) closeMobile(); });
     window.addEventListener("resize", () => { if (window.innerWidth > 960) closeMobile(); });
 

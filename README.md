@@ -22,6 +22,13 @@ python -m http.server 5173
 | Location | Address, phone, live open/closed status, hours, storefront photo, directions |
 | Contact | Form + Google Map at the bottom |
 
+## Mobile
+
+- On phones the hero stacks the bowl above the text, and switches to side-by-side when the phone is turned sideways.
+- A floating **Call · Directions · Menu · Order** bar appears once you scroll past the hero.
+- The hero animation runs a lighter version on phones and low-power devices (fewer drawn pieces, simpler sauce effect, 30fps).
+- Tested at 320×568, 375×812, 414×896 and 812×375 (landscape) with no sideways scrolling.
+
 ## Editing
 
 - **Settings** (contact email, phone, hours, links): `js/config.js`

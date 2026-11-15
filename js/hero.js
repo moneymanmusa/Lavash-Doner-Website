@@ -14,6 +14,10 @@
   if (!hero) return;
 
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Phones / low-power devices get a lighter version of the scene.
+  const LITE = window.matchMedia("(max-width: 960px), (pointer: coarse)").matches || (navigator.hardwareConcurrency || 8) <= 4;
+  const K = LITE ? 0.55 : 1;
+  const cnt = (n) => Math.round(n * K);
   const NS = "http://www.w3.org/2000/svg";
   const TAU = Math.PI * 2;
   const rad = (d) => (d * Math.PI) / 180;
@@ -57,6 +61,15 @@
 
   /* ---------------- liquid ("goo") filters ---------------- */
   function gooFilter(id, sd, mul, off, dx, dy, sh) {
+    if (LITE) {
+      return `<filter id="${id}" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="${sd}" result="b"/>
+        <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 ${mul} ${off}" result="g"/>
+        <feOffset in="g" dx="${dx}" dy="${dy}" result="o"/>
+        <feColorMatrix in="o" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .4 0" result="drop"/>
+        <feMerge><feMergeNode in="drop"/><feMergeNode in="g"/></feMerge>
+      </filter>`;
+    }
     return `<filter id="${id}" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
       <feGaussianBlur in="SourceGraphic" stdDeviation="${sd}" result="b"/>
       <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 ${mul} ${off}" result="g"/>
@@ -226,17 +239,17 @@
 
     // salad bed: lettuce, red cabbage, carrot
     let salad = `<g class="ing ing--salad"><path d="${sector(r, -6, 238, 70, 428)}" fill="#5f8f2c"/>`;
-    for (let i = 0; i < 230; i++) { const [x, y] = polar(r, -6, 238, 110, 418); salad += shred(r, x, y, 34 + r() * 40, 13 + r() * 9, pick(r, ["#86bd4c", "#79b23f", "#9ccd5e", "#6ea838"]), pick(r, ["#e6f4c8", "#d9eeb0", "#f0f8de", "#cfe8a2"]), 0.58, 0.95); }
-    for (let i = 0; i < 95; i++) { const [x, y] = polar(r, 100, 236, 150, 415); salad += shred(r, x, y, 30 + r() * 36, 7 + r() * 4, pick(r, ["#5e1a4c", "#7a2563", "#923878"]), "#ecc9e4", 0.3, 0.55); }
-    for (let i = 0; i < 55; i++) { const [x, y] = polar(r, 40, 236, 160, 410); salad += shred(r, x, y, 28 + r() * 30, 4 + r() * 1.6, pick(r, ["#ff9a2e", "#f57f17", "#ffb04d"])); }
+    for (let i = 0; i < cnt(230); i++) { const [x, y] = polar(r, -6, 238, 110, 418); salad += shred(r, x, y, 34 + r() * 40, 13 + r() * 9, pick(r, ["#86bd4c", "#79b23f", "#9ccd5e", "#6ea838"]), pick(r, ["#e6f4c8", "#d9eeb0", "#f0f8de", "#cfe8a2"]), 0.58, 0.95); }
+    for (let i = 0; i < cnt(95); i++) { const [x, y] = polar(r, 100, 236, 150, 415); salad += shred(r, x, y, 30 + r() * 36, 7 + r() * 4, pick(r, ["#5e1a4c", "#7a2563", "#923878"]), "#ecc9e4", 0.3, 0.55); }
+    for (let i = 0; i < cnt(55); i++) { const [x, y] = polar(r, 40, 236, 160, 410); salad += shred(r, x, y, 28 + r() * 30, 4 + r() * 1.6, pick(r, ["#ff9a2e", "#f57f17", "#ffb04d"])); }
     salad += `</g>`;
 
     // seasoned rice
     let rice = `<g class="ing ing--rice"><path d="${sector(r, -130, -2, 90, 428)}" fill="#ead3a0"/>`;
-    for (let i = 0; i < 700; i++) {
+    for (let i = 0; i < cnt(700); i++) {
       const [x, y] = polar(r, -128, -4, 100, 420);
       const c = r() < 0.16 ? pick(r, ["#f0c06e", "#e8a95a", "#f3cd86"]) : pick(r, ["#fff7e2", "#f8ecd0", "#f1dfb5", "#fbf3df", "#e9d09a"]);
-      rice += `<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="${f1(9 + r() * 3)}" ry="${f1(4.2 + r() * 1.2)}" fill="${c}" stroke="rgba(130,90,35,.3)" stroke-width="1" transform="rotate(${Math.round(r() * 180)} ${f1(x)} ${f1(y)})"/>`;
+      rice += `<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="${f1((9 + r() * 3) * (LITE ? 1.25 : 1))}" ry="${f1((4.2 + r() * 1.2) * (LITE ? 1.25 : 1))}" fill="${c}" stroke="rgba(130,90,35,.3)" stroke-width="1" transform="rotate(${Math.round(r() * 180)} ${f1(x)} ${f1(y)})"/>`;
     }
     rice += `</g>`;
 
@@ -249,14 +262,14 @@
 
     // shaved döner piled in the middle
     const strips = [];
-    for (let i = 0; i < 330; i++) {
+    for (let i = 0; i < (LITE ? 210 : 330); i++) {
       const a = r() * TAU, rr = 248 * Math.sqrt(r());
       strips.push({ x: 478 + Math.cos(a) * rr * 1.06, y: 474 + Math.sin(a) * rr * 0.94, d: rr });
     }
     for (let i = 0; i < 26; i++) { const a = rad(-40 + r() * 120), rr = 250 + r() * 60; strips.push({ x: 478 + Math.cos(a) * rr, y: 474 + Math.sin(a) * rr, d: rr }); }
     strips.sort((p, q) => q.d - p.d);
     let meat = `<circle cx="492" cy="492" r="300" fill="url(#bw-pile)"/><g class="ing ing--meat"><g filter="url(#meat-tex)"><path d="${sector(r, 0, 360, 0, 258, 478, 474)}" fill="#c27a32"/>`;
-    strips.forEach((m) => { meat += meatStrip(r, m.x, m.y, 58 + r() * 36, 30 + r() * 16); });
+    strips.forEach((m) => { meat += meatStrip(r, m.x, m.y, (58 + r() * 36) * (LITE ? 1.15 : 1), (30 + r() * 16) * (LITE ? 1.15 : 1)); });
     meat += `</g>`;
     meat += `<circle cx="470" cy="455" r="290" fill="url(#bw-light)"/>`;
     for (let i = 0; i < 34; i++) { const [x, y] = polar(r, 0, 360, 0, 240, 478, 474); meat += `<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="${f1(4 + r() * 6)}" ry="${f1(2 + r() * 2)}" fill="#fff" opacity="${f1(0.18 + r() * 0.25)}" transform="rotate(${Math.round(r() * 180)} ${f1(x)} ${f1(y)})"/>`; }
@@ -264,12 +277,12 @@
 
     // garnish: parsley + sumac
     let gar = `<g class="ing ing--garnish">`;
-    for (let i = 0; i < 95; i++) {
+    for (let i = 0; i < cnt(95); i++) {
       const [x, y] = polar(r, 0, 360, 0, 380);
       const s1 = 3 + r() * 4;
       gar += `<path d="M${f1(x)},${f1(y - s1)}L${f1(x + s1)},${f1(y)}L${f1(x)},${f1(y + s1 * 0.8)}L${f1(x - s1 * 0.9)},${f1(y)}Z" fill="${pick(r, ["#2f7d1e", "#3f9a2a", "#256a16"])}"/>`;
     }
-    for (let i = 0; i < 150; i++) { const [x, y] = polar(r, 0, 360, 0, 400); gar += `<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(1.6 + r() * 1.8)}" fill="#8f1d14" opacity=".85"/>`; }
+    for (let i = 0; i < cnt(150); i++) { const [x, y] = polar(r, 0, 360, 0, 400); gar += `<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(1.6 + r() * 1.8)}" fill="#8f1d14" opacity=".85"/>`; }
     gar += `</g>`;
 
     s += salad + rice + veg + meat + gar;
@@ -475,8 +488,8 @@
   const gHot = document.createElementNS(NS, "g"); gHot.setAttribute("filter", "url(#goo)"); gHot.setAttribute("fill", SAUCE.hot);
   sauceSvg.append(gGarlic, gHot);
 
-  const garlic = new Pour(gGarlic, { seed: 11, x: 300, y: 330, a: 0.2, n: 170, step: 15, turn: 0.75, loop: 0.42, curl: 0.42, ph: 0, cx: 490, cy: 485, maxR: 330, base: 13.5, pool: 0.08, splash: 0.75, streamN: 30, streamR: 7.5 });
-  const hot = new Pour(gHot, { seed: 29, x: 700, y: 360, a: 2.6, n: 150, step: 15, turn: 0.95, loop: 0.5, curl: 0.38, ph: 2, cx: 490, cy: 490, maxR: 320, base: 9.5, pool: 0.06, splash: 0.7, streamN: 30, streamR: 5.6 });
+  const garlic = new Pour(gGarlic, { seed: 11, x: 300, y: 330, a: 0.2, n: 170, step: 15, turn: 0.75, loop: 0.42, curl: 0.42, ph: 0, cx: 490, cy: 485, maxR: 330, base: 13.5, pool: 0.08, splash: LITE ? 0.45 : 0.75, streamN: LITE ? 20 : 30, streamR: 7.5 });
+  const hot = new Pour(gHot, { seed: 29, x: 700, y: 360, a: 2.6, n: 150, step: 15, turn: 0.95, loop: 0.5, curl: 0.38, ph: 2, cx: 490, cy: 490, maxR: 320, base: 9.5, pool: 0.06, splash: LITE ? 0.4 : 0.7, streamN: LITE ? 20 : 30, streamR: 5.6 });
 
   const wrapGarlic = new Pour(hero.querySelector("[data-wrap-garlic]"), { seed: 5, x: 55, y: 120, a: -0.2, n: 60, step: 7, turn: 0.9, loop: 0.55, curl: 0.5, ph: 1, cx: 160, cy: 118, maxR: 95, base: 6.5, pool: 0.08, splash: 0.6 });
   const wrapHot = new Pour(hero.querySelector("[data-wrap-hot]"), { seed: 8, x: 250, y: 110, a: 3.0, n: 50, step: 7, turn: 1.0, loop: 0.6, curl: 0.45, ph: 3, cx: 160, cy: 115, maxR: 90, base: 4.8, pool: 0.06, splash: 0.6 });
@@ -494,14 +507,14 @@
   // big splats across the whole screen, dripping down
   const bgSvg = hero.querySelector("[data-splats]");
   const bgSplats = [
-    { s: new Splat(bgSvg, 1420, 170, 105, SAUCE.garlic, 201, "goo-lg", 3), t: 0.29 },
+    { s: new Splat(bgSvg, 1420, 170, 105, SAUCE.garlic, 201, "goo-lg", LITE ? 2 : 3), t: 0.29 },
     { s: new Splat(bgSvg, 560, 120, 58, SAUCE.garlic, 202, "goo-lg", 2), t: 0.33 },
     { s: new Splat(bgSvg, 170, 760, 120, SAUCE.hot, 203, "goo-lg", 3), t: 0.55 },
     { s: new Splat(bgSvg, 1530, 560, 70, SAUCE.hot, 204, "goo-lg", 2), t: 0.59 },
     { s: new Splat(bgSvg, 930, 60, 80, SAUCE.orange, 205, "goo-lg", 3), t: 0.7 },
     { s: new Splat(bgSvg, 1290, 900, 110, SAUCE.garlic, 206, "goo-lg", 2), t: 0.83 },
     { s: new Splat(bgSvg, 420, 950, 64, SAUCE.orange, 207, "goo-lg", 2), t: 0.88 }
-  ];
+  ].filter((b, i) => !LITE || [0, 2, 4, 5].includes(i));
 
   const bottles = { garlic: hero.querySelector("[data-bottle=garlic]"), hot: hero.querySelector("[data-bottle=hot]") };
   const wrap = hero.querySelector("[data-wrap]");
@@ -581,8 +594,10 @@
   // One cycle: ~14s of pouring, hold the finished bowl, fade the sauce, repeat.
   const DUR = 14000, HOLD = 4500, FADE = 900, CYCLE = DUR + HOLD + FADE;
   let clock = -1900; // let the bowl assemble itself first
-  let last = null;
+  let last = null, lastRender = 0;
   function frame(now) {
+    if (LITE && now - lastRender < 30) { if (inView && !document.hidden) requestAnimationFrame(frame); else running = false; return; }
+    lastRender = now;
     if (last === null) last = now;
     clock += Math.min(250, now - last);
     last = now;
